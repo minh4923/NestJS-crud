@@ -1,0 +1,30 @@
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { User, UserDocument } from '../schemas/user.schema';
+import { Model } from 'mongoose';
+import { UpdateUserDto } from '../dto/update-user.dto';
+import { boolean } from 'joi';
+@Injectable()
+export class UserRepository {
+  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+  async createUser(data: Partial<User>): Promise<User>{
+    const newUser = new this.userModel(data);
+    return newUser.save(); 
+  }
+  async getUserByEmail(email: string): Promise<User | null>{
+    return this.userModel.findOne({email}).exec();
+  }
+  async getAllUsers(): Promise<User[]> {
+    return this.userModel.find().exec();
+  }
+  async getUserById(id: string): Promise<User | null> {
+    return this.userModel.findById(id).exec();
+  }
+  async updateUserById(id: string, data: UpdateUserDto): Promise<User | null> {
+    return this.userModel.findByIdAndUpdate(id, data, { new: true }).exec();
+  }
+  async deleteUserById(id: string): Promise<Boolean> {
+    const result = await this.userModel.findByIdAndDelete(id).exec();
+    return result !== null;
+  }
+}
