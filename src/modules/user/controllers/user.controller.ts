@@ -6,20 +6,24 @@ import {
   Delete,
   Body,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { UserService } from '../services/user.service';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { AdminGuard } from 'src/modules/auth/guards/admin.guard';
-import { OwnerOrAdminGuard } from 'src/modules/auth/guards/owner-or-admin.guard';
+import { AdminGuard } from '../../auth/guards/admin.guard';
+import { AccountInfo } from '../../auth/guards/accountInfo.gurad';
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
   @UseGuards(AuthGuard('jwt'))
-  async getAllUsers() {
-    return this.userService.getAllUsers();
+  async getAllUsers(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return this.userService.getAllUsers(page, limit);
   }
 
   @Get(':id')
@@ -29,7 +33,7 @@ export class UserController {
   }
 
   @Put(':id')
-  @UseGuards(AuthGuard('jwt'), OwnerOrAdminGuard)
+  @UseGuards(AuthGuard('jwt'), AccountInfo)
   async updateUserById(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,

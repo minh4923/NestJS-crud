@@ -8,7 +8,7 @@ import {
 import { PostRepository } from '../../post/repositories/post.repository';
 
 @Injectable()
-export class OwnerOrAdminGuard implements CanActivate {
+export class PostInfo implements CanActivate {
   constructor(private readonly postRepository: PostRepository) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -16,18 +16,18 @@ export class OwnerOrAdminGuard implements CanActivate {
     const postId = req.params.id;
 
     if (!req.user) {
-      throw new UnauthorizedException('Bạn chưa đăng nhập');
+      throw new UnauthorizedException('Please login!');
     }
 
     const post = await this.postRepository.getPostById(postId);
     if (!post) {
-      throw new ForbiddenException('Bài viết không tồn tại');
+      throw new ForbiddenException('Post not found');
     }
 
     if (req.user.role === 'admin' || post.author.toString() === req.user.id) {
-      return true; // ✅ Nếu là admin hoặc chủ bài viết, cho phép truy cập
+      return true; 
     }
 
-    throw new ForbiddenException('Bạn không có quyền thực hiện hành động này');
+    throw new ForbiddenException('Permision denied');
   }
 }

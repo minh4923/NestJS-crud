@@ -8,22 +8,46 @@ import { PostDocument, Post } from '../schemas/post.schema';
 @Injectable()
 export class PostRepository {
   constructor(@InjectModel(Post.name) private postModel: Model<PostDocument>) {}
+
   async createPost(data: CreatePostDto, userId: string): Promise<Post> {
-    const newPost = new this.postModel({ ...CreatePostDto, author: userId });
+    const newPost = new this.postModel({ ...data, author: userId });
     return newPost.save();
   }
-  async getAllPost(): Promise<Post[]> {
-    return this.postModel.find().exec();
+
+  async getAllPost(skip: number, limit: number) {
+    const posts = await this.postModel.find().skip(skip).limit(limit).exec();
+    const total = await this.postModel.countDocuments().exec();
+    return {
+      data: posts,
+      total,
+      page: Math.ceil(skip / limit) + 1,
+      limit,
+    };
   }
+
   async getPostById(id: string): Promise<Post | null> {
     return this.postModel.findById(id).exec();
   }
-  async getAllPostByUserId(UserId: string): Promise<Post[]> {
-    return this.postModel.find({ Author: UserId }).exec();
+
+  async getAllPostByUserId(UserId: string, skip: number, limit: number) {
+    const posts = await this.postModel
+      .find({ author: UserId })
+      .skip(skip)
+      .limit(limit)
+      .exec();
+    const total = await this.postModel.countDocuments().exec();
+    return {
+      data: posts,
+      total,
+      page: Math.ceil(skip / limit) + 1,
+      limit,
+    };
   }
-  async updatePostById(id: string, data:UpdatePostDto ): Promise<Post | null> {
-    return this.postModel.findByIdAndUpdate(id, UpdatePostDto).exec();
+
+  async updatePostById(id: string, data: UpdatePostDto): Promise<Post | null> {
+    return this.postModel.findByIdAndUpdate(id, data, { new: true }).exec();
   }
+  
   async deletePostById(id: string): Promise<boolean> {
     const user = this.postModel.findByIdAndDelete(id);
     return user !== null;

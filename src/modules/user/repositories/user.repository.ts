@@ -7,15 +7,22 @@ import { boolean } from 'joi';
 @Injectable()
 export class UserRepository {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
-  async createUser(data: Partial<User>): Promise<User>{
+  async createUser(data: Partial<User>): Promise<User> {
     const newUser = new this.userModel(data);
-    return newUser.save(); 
+    return newUser.save();
   }
-  async getUserByEmail(email: string): Promise<User | null>{
-    return this.userModel.findOne({email}).exec();
+  async getUserByEmail(email: string): Promise<User | null> {
+    return this.userModel.findOne({ email }).exec();
   }
-  async getAllUsers(): Promise<User[]> {
-    return this.userModel.find().exec();
+  async getAllUsers(skip: number, limit: number){
+    const users = await this.userModel.find().skip(skip).limit(limit).exec();
+    const total  = await this.userModel.countDocuments().exec();
+    return {
+      data: users,
+      total,
+      page: Math.ceil(skip/limit)+1,
+      limit 
+    }
   }
   async getUserById(id: string): Promise<User | null> {
     return this.userModel.findById(id).exec();

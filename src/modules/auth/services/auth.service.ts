@@ -4,7 +4,7 @@ import { LoginDto } from '../dto/auth-login.dto';
 import * as bcrypt from 'bcrypt';
 import { UserRepository } from '../../user/repositories/user.repository';
 import { JwtService } from '@nestjs/jwt';
-import { UserDocument } from '../../user/schemas/user.schema';
+import { User, UserDocument } from '../../user/schemas/user.schema';
 import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class AuthService {
@@ -23,7 +23,7 @@ export class AuthService {
 
   async login(
     loginDto: LoginDto,
-  ): Promise<{ accessToken: string; refreshToken: string }> {
+  ): Promise<{ accessToken: string; refreshToken: string; userId: any}> {
     const user = await this.userRepository.getUserByEmail(loginDto.email);
     if (!user || !(await bcrypt.compare(loginDto.password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
@@ -41,6 +41,7 @@ export class AuthService {
           expiresIn: this.configService.get<string>('jwt.refreshExpiresIn'),
         },
       ),
+      userId: (user as UserDocument)._id,
     };
   }
 }

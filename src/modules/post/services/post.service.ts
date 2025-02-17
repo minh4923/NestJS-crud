@@ -25,8 +25,9 @@ export class PostService {
     }
   }
 
-  async getAllPost(): Promise<Post[]> {
-    return this.postRepository.getAllPost();
+  async getAllPost(page: number, limit: number) {
+    const skip = (page - 1) * limit;
+    return this.postRepository.getAllPost(skip, limit);
   }
 
   async getPostById(id: string): Promise<Post> {
@@ -35,10 +36,11 @@ export class PostService {
     return post;
   }
 
-  async getAllPostByUserId(userId: string): Promise<Post[]> {
+  async getAllPostByUserId(userId: string, page: number, limit: number) {
+    const skip = (page - 1) * limit;
     const user = await this.userRepository.getUserById(userId);
     if (!user) throw new NotFoundException(`User with Id: ${userId} not found`);
-    return await this.postRepository.getAllPostByUserId(userId);
+    return await this.postRepository.getAllPostByUserId(userId, skip, limit);
   }
 
   async updatePostById(id: string, data: UpdatePostDto): Promise<Post> {

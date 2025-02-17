@@ -9,19 +9,17 @@ import {
   UseGuards,
   Req,
   NotFoundException,
+  Query,
 } from '@nestjs/common';
 import { PostService } from '../services/post.service';
 import { CreatePostDto } from '../dto/create-post.dto';
 import { UpdatePostDto } from '../dto/update-post.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Post as Posts } from '../schemas/post.schema';
-import { AdminGuard } from 'src/modules/auth/guards/admin.guard';
-import { OwnerOrAdminGuard } from 'src/modules/auth/guards/owner-or-admin.guard';
-import { User, UserDocument } from 'src/modules/user/schemas/user.schema';
-import { Request } from 'express';
+import { PostInfo } from '../../auth/guards/postInfo.guard';
 import { AuthenticatedRequest } from 'src/common/interfaces/authenticated-request';
 @Controller('posts')
-export class PostControlelr {
+export class PostControler {
   constructor(private readonly postService: PostService) {}
 
   @Post()
@@ -36,8 +34,11 @@ export class PostControlelr {
 
   @Get()
   @UseGuards(AuthGuard('jwt'))
-  async getAllPost(): Promise<Posts[]> {
-    return this.postService.getAllPost();
+  async getAllPost(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return this.postService.getAllPost(page, limit);
   }
 
   @Get(':id')
@@ -48,12 +49,16 @@ export class PostControlelr {
 
   @Get('user/:userId')
   @UseGuards(AuthGuard('jwt'))
-  async getAllPostByUserId(@Param('userId') userId: string) {
-    return this.postService.getAllPostByUserId(userId);
+  async getAllPostByUserId(
+    @Param('userId') userId: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return this.postService.getAllPostByUserId(userId, page, limit);
   }
 
   @Put(':id')
-  @UseGuards(AuthGuard('jwt'), OwnerOrAdminGuard)
+  @UseGuards(AuthGuard('jwt'), PostInfo)
   async updatePostById(
     @Param() id: string,
     @Body() data: UpdatePostDto,
@@ -62,7 +67,7 @@ export class PostControlelr {
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard('jwt'), OwnerOrAdminGuard)
+  @UseGuards(AuthGuard('jwt'), PostInfo)
   async deletePostById(@Param('id') id: string): Promise<{ message: string }> {
     return this.postService.deletePostById(id);
   }

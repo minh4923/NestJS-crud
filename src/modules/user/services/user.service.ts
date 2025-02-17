@@ -5,8 +5,9 @@ import { MESSAGES } from '@nestjs/core/constants';
 @Injectable()
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
-  async getAllUsers() {
-    return this.userRepository.getAllUsers();
+  async getAllUsers(page: number, limit: number) {
+    const skip = (page - 1)*limit 
+    return this.userRepository.getAllUsers(skip, limit);
   }
   async getUserById(id: string) {
     const user = await this.userRepository.getUserById(id);
@@ -14,7 +15,7 @@ export class UserService {
     return user;
   }
   async updateUserById(id: string, data: UpdateUserDto) {
-    const user = await this.userRepository.updateUserById(id, data);
+    const user = await this.userRepository.updateUserById(id, data);  
     if (!user) throw new NotFoundException(`User with Id: ${id} not found`);
     return user;
   }
