@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    restart: always
+    ports:
+      - '27017:27017'
+    networks:
+      - my_network
+
+  app:
+    build: .
+    container_name: nestjs_app
+    depends_on:
+      - mongodb
+    env_file:
+      - .env # Chỉ định file .env thay vì viết trực tiếp vào đây
+    networks:
+      - my_network
+    ports:
+      - '3000:3000'
+
+networks:
+  my_network:
