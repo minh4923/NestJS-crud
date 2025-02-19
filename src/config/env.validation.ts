@@ -10,6 +10,14 @@ class EnvConfig {
   @IsString()
   @IsNotEmpty()
   MONGODB_URI: string;
+
+  @IsNotEmpty()
+  @IsString()
+  JWT_ACCESS_SECRET: string;
+
+  @IsNotEmpty()
+  @IsString()
+  JWT_REFRESH_SECRET: string; 
 }
 
 export function validateEnv(config: Record<string, unknown>) {

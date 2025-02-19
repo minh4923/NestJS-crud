@@ -1,23 +1,13 @@
-# Sử dụng Node.js phiên bản mới nhất làm base image
 FROM node:18
 
-# Thiết lập thư mục làm việc
-WORKDIR /app
+WORKDIR /nest-js-crud-vip
 
-# Sao chép package.json và package-lock.json vào container
 COPY package*.json ./
 
-# Cài đặt dependencies
 RUN npm install
 
-# Sao chép toàn bộ source code vào container
 COPY . .
 
-# Biên dịch code TypeScript sang JavaScript
-RUN npm run build
+RUN npm run build  # Đảm bảo build project
 
-# Expose cổng mặc định của ứng dụng
-EXPOSE 3000
-
-# Chạy ứng dụng NestJS
-CMD ["npm", "run", "start:prod"]
+CMD ["node", "dist/main"]

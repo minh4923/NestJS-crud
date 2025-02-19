@@ -7,11 +7,14 @@ import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { PostModule } from './modules/post/post.module';
 import { createAdmin } from './scripts/create-Admin';
+import jwtConfig from './config/jwt.config';
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      validate: validateEnv,
+      envFilePath: process.env.NODE_ENV === 'test'? '.env.test' :'env',
+      validate: validateEnv,   
+      load: [jwtConfig]
     }),
 
     MongooseModule.forRootAsync({
