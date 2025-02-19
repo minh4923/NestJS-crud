@@ -7,27 +7,30 @@ import { boolean } from 'joi';
 @Injectable()
 export class UserRepository {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
-  async createUser(data: Partial<User>): Promise<User> {
-    const newUser = new this.userModel(data);
-    return newUser.save();
+  async createUser(data: Partial<User>): Promise<UserDocument> {
+    return await this.userModel.create(data);
   }
-  async getUserByEmail(email: string): Promise<User | null> {
+
+  async getUserByEmail(email: string): Promise<UserDocument | null> {
     return this.userModel.findOne({ email }).exec();
   }
-  async getAllUsers(skip: number, limit: number){
+  async getAllUsers(skip: number, limit: number) {
     const users = await this.userModel.find().skip(skip).limit(limit).exec();
-    const total  = await this.userModel.countDocuments().exec();
+    const total = await this.userModel.countDocuments().exec();
     return {
       data: users,
       total,
-      page: Math.ceil(skip/limit)+1,
-      limit 
-    }
+      page: Math.ceil(skip / limit) + 1,
+      limit,
+    };
   }
-  async getUserById(id: string): Promise<User | null> {
+  async getUserById(id: string): Promise<UserDocument | null> {
     return this.userModel.findById(id).exec();
   }
-  async updateUserById(id: string, data: UpdateUserDto): Promise<User | null> {
+  async updateUserById(
+    id: string,
+    data: UpdateUserDto,
+  ): Promise<UserDocument | null> {
     return this.userModel.findByIdAndUpdate(id, data, { new: true }).exec();
   }
   async deleteUserById(id: string): Promise<Boolean> {
