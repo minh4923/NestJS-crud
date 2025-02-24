@@ -3,7 +3,7 @@ import { triggerAsyncId } from 'async_hooks';
 export default registerAs('jwt', () => ({
   accessSecret:
     process.env.JWT_ACCESS_SECRET ||
-    (process.env.NODE_ENV === 'test' ? 'access_test_token ' : 'access_token'),
+    (process.env.NODE_ENV === 'test' ? 'access_test_token' : 'access_token'),
   accessExpiresIn:
     process.env.JWT_ACCESS_EXPIRES_IN ||
     (process.env.NODE_ENV === 'test' ? '10m' : '1h'),

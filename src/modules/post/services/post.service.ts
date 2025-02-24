@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PostRepository } from '../repositories/post.repository';
 import { CreatePostDto } from '../dto/create-post.dto';
 import { UpdatePostDto } from '../dto/update-post.dto';
-import { Post } from '../schemas/post.schema';
+import { Post, PostDocument } from '../schemas/post.schema';
 import { UserRepository } from '../../user/repositories/user.repository';
 
 @Injectable()
@@ -12,7 +12,7 @@ export class PostService {
     private readonly userRepository: UserRepository,
   ) {}
 
-  async createPost(data: CreatePostDto, userId: string): Promise<Post> {
+  async createPost(data: CreatePostDto, userId: string): Promise<PostDocument> {
     try {
       const user = await this.userRepository.getUserById(userId);
       if (!user) {
@@ -20,8 +20,10 @@ export class PostService {
       }
       return await this.postRepository.createPost(data, userId);
     } catch (error) {
-      console.error(error);
-      throw new Error('Lỗi khi tạo bài viết');
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new Error('Error while creating post');
     }
   }
 
@@ -30,7 +32,7 @@ export class PostService {
     return this.postRepository.getAllPost(skip, limit);
   }
 
-  async getPostById(id: string): Promise<Post> {
+  async getPostById(id: string): Promise<PostDocument> {
     const post = await this.postRepository.getPostById(id);
     if (!post) throw new NotFoundException(`Post with Id: ${id} not found`);
     return post;
@@ -43,7 +45,7 @@ export class PostService {
     return await this.postRepository.getAllPostByUserId(userId, skip, limit);
   }
 
-  async updatePostById(id: string, data: UpdatePostDto): Promise<Post> {
+  async updatePostById(id: string, data: UpdatePostDto): Promise<PostDocument> {
     const post = await this.postRepository.updatePostById(id, data);
     if (!post) throw new NotFoundException(`Post with Id: ${id} not found`);
     return post;

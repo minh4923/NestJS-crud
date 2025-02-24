@@ -22,7 +22,7 @@ services:
       - my_network
     volumes:
       - mongodb_test_data:/data/db
-  
+
   app:
     build: .
     container_name: nestjs_app
@@ -34,6 +34,8 @@ services:
       - my_network
     ports:
       - '3000:3000'
+    environment:
+      - NODE_ENV=${NODE_ENV:-} # Không set mặc định, chỉ nhận nếu truyền vào
 
   test_runner:
     build: .
@@ -44,10 +46,12 @@ services:
       - .env.test
     networks:
       - my_network
+    environment:
+      - NODE_ENV=${NODE_ENV:-} # Không set mặc định, chỉ nhận nếu truyền vào
     command: sh -c "npm run test || true && tail -f /dev/null"
-    
-    stdin_open: true  # Giữ container mở
-    tty: true 
+
+    stdin_open: true # Giữ container mở
+    tty: true
 
 volumes:
   mongodb_data:

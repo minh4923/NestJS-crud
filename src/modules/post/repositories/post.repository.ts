@@ -9,7 +9,7 @@ import { PostDocument, Post } from '../schemas/post.schema';
 export class PostRepository {
   constructor(@InjectModel(Post.name) private postModel: Model<PostDocument>) {}
 
-  async createPost(data: CreatePostDto, userId: string): Promise<Post> {
+  async createPost(data: CreatePostDto, userId: string): Promise<PostDocument> {
     const newPost = new this.postModel({ ...data, author: userId });
     return newPost.save();
   }
@@ -25,7 +25,7 @@ export class PostRepository {
     };
   }
 
-  async getPostById(id: string): Promise<Post | null> {
+  async getPostById(id: string): Promise<PostDocument | null> {
     return this.postModel.findById(id).exec();
   }
 
@@ -44,12 +44,12 @@ export class PostRepository {
     };
   }
 
-  async updatePostById(id: string, data: UpdatePostDto): Promise<Post | null> {
+  async updatePostById(id: string, data: UpdatePostDto): Promise<PostDocument | null> {
     return this.postModel.findByIdAndUpdate(id, data, { new: true }).exec();
   }
   
   async deletePostById(id: string): Promise<boolean> {
-    const user = this.postModel.findByIdAndDelete(id);
-    return user !== null;
+    const post = await this.postModel.findByIdAndDelete(id);
+    return post !== null;
   }
 }

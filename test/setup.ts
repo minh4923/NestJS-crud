@@ -8,7 +8,7 @@ import { Model, Connection } from 'mongoose';
 import { User, UserSchema, UserDocument } from '../src/modules/user/schemas/user.schema';
 import { Post, PostSchema, PostDocument } from '../src/modules/post/schemas/post.schema';
 import { AuthService } from '../src/modules/auth/services/auth.service';
-import { PostService } from '../src/modules/post/services/post.service';
+import { PostService } from '../src/modules/post/services/post.service';  
 import { UserService } from '../src/modules/user/services/user.service';
 import { UserRepository } from '../src/modules/user/repositories/user.repository';
 import { PostRepository } from '../src/modules/post/repositories/post.repository';
@@ -32,13 +32,14 @@ export async function createTestingModule(providers: any[] = []) {
   return { module, userModel, postModel, connection };
 }
 
-export async function cleanDatabase(
-  userModel?: Model<UserDocument>,
-  postModel?: Model<PostDocument>,
-) {
-  if (userModel) await userModel.deleteMany({});
-  if (postModel) await postModel.deleteMany({});
+export async function cleanDatabase(models: Model<any>[] = []) {
+  for (const model of models) {
+    if (model) {
+      await model.deleteMany({});
+    }
+  }
 }
+
 
 export async function closeConnection(connection: Connection) {
   await connection.close();

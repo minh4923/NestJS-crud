@@ -11,7 +11,7 @@ export class AuthService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService
   ) {}
   async register(RegisterDto: RegisterDto) {
     const hashedPassword = await bcrypt.hash(RegisterDto.password, 10);
@@ -22,24 +22,34 @@ export class AuthService {
   }
 
   async login(
-    loginDto: LoginDto,
-  ): Promise<{ accessToken: string; refreshToken: string; userId: any}> {
+    loginDto: LoginDto
+  ): Promise<{ accessToken: string; refreshToken: string; userId: any }> {
     const user = await this.userRepository.getUserByEmail(loginDto.email);
     if (!user || !(await bcrypt.compare(loginDto.password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
+    console.log(
+      'JWT_ACCESS_SECRET:',
+      this.configService.get<string>('jwt.accessSecret')
+    );
     return {
-      accessToken: this.jwtService.sign({
-        sub: (user as UserDocument)._id,
-        email: user.email,
-        role: user.role,
-      }),
+      accessToken: this.jwtService.sign(
+        {
+          sub: (user as UserDocument)._id,
+          email: user.email,
+          role: user.role,
+        },
+        {
+          secret: this.configService.get<string>('jwt.accessSecret'),
+          expiresIn: this.configService.get<string>('jwt.accessExpiresIn'),
+        }
+      ),
       refreshToken: this.jwtService.sign(
         { sub: (user as UserDocument)._id },
         {
           secret: this.configService.get<string>('jwt.refreshSecret'),
           expiresIn: this.configService.get<string>('jwt.refreshExpiresIn'),
-        },
+        }
       ),
       userId: (user as UserDocument)._id,
     };

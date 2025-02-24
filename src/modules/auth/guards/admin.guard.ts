@@ -12,11 +12,11 @@ export class AdminGuard implements CanActivate {
     const req = context.switchToHttp().getRequest();
 
     if (!req.user) {
-      throw new UnauthorizedException('Bạn chưa đăng nhập');
+      throw new UnauthorizedException('You are not logged in yet');
     }
 
     if (req.user.role !== 'admin') {
-      throw new ForbiddenException('Bạn không có quyền truy cập');
+      throw new ForbiddenException('You do not have access');
     }
 
     return true; 
