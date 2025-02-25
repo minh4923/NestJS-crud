@@ -3,19 +3,19 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { MongooseModule, getConnectionToken } from '@nestjs/mongoose';
 import { getModelToken } from '@nestjs/mongoose';
 import { Model, Connection } from 'mongoose';
-
-// Import các schema & repository/module khác nhau
+import { ConfigModule } from '@nestjs/config';
+import jwtConfig from '../src/config/jwt.config';
+import { AppModule } from '../src/app.module';
 import { User, UserSchema, UserDocument } from '../src/modules/user/schemas/user.schema';
 import { Post, PostSchema, PostDocument } from '../src/modules/post/schemas/post.schema';
-import { AuthService } from '../src/modules/auth/services/auth.service';
-import { PostService } from '../src/modules/post/services/post.service';  
-import { UserService } from '../src/modules/user/services/user.service';
-import { UserRepository } from '../src/modules/user/repositories/user.repository';
-import { PostRepository } from '../src/modules/post/repositories/post.repository';
-
 export async function createTestingModule(providers: any[] = []) {
   const module: TestingModule = await Test.createTestingModule({
     imports: [
+      ConfigModule.forRoot({
+        isGlobal: true,
+        envFilePath: '.env.test',
+        load: [jwtConfig], 
+      }),
       MongooseModule.forRoot(process.env.MONGODB_URI as string),
       MongooseModule.forFeature([
         { name: User.name, schema: UserSchema },

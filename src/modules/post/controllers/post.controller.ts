@@ -1,15 +1,4 @@
-import {
-  Controller,
-  Post,
-  Get,
-  Put,
-  Delete,
-  Param,
-  Body,
-  UseGuards,
-  Req,
-  Query,
-} from '@nestjs/common';
+import { Controller, Post, Get, Put, Delete, Param, Body, UseGuards, Req, Query } from '@nestjs/common';
 import { PostService } from '../services/post.service';
 import { CreatePostDto } from '../dto/create-post.dto';
 import { UpdatePostDto } from '../dto/update-post.dto';
@@ -17,18 +6,10 @@ import { AuthGuard } from '@nestjs/passport';
 import { Post as Posts } from '../schemas/post.schema';
 import { PostInfo } from '../../auth/guards/postInfo.guard';
 import { AuthenticatedRequest } from 'src/common/interfaces/authenticated-request';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-  ApiQuery,
-  ApiParam,
-  ApiBody,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery, ApiParam, ApiBody } from '@nestjs/swagger';
 
-@ApiTags('Posts') 
-@ApiBearerAuth() 
+@ApiTags('Posts')
+@ApiBearerAuth()
 @Controller('posts')
 export class PostControler {
   constructor(private readonly postService: PostService) {}
@@ -39,10 +20,7 @@ export class PostControler {
   @ApiBody({ type: CreatePostDto })
   @ApiResponse({ status: 201, description: 'The post has been created' })
   @ApiResponse({ status: 400, description: 'Invalid input data' })
-  async createPost(
-    @Body() data: CreatePostDto,
-    @Req() req: AuthenticatedRequest
-  ): Promise<Posts> {
+  async createPost(@Body() data: CreatePostDto, @Req() req: AuthenticatedRequest): Promise<Posts> {
     const userId = req.user.id;
     return this.postService.createPost(data, userId);
   }
@@ -66,10 +44,7 @@ export class PostControler {
     status: 200,
     description: 'The list of posts has been returned',
   })
-  async getAllPost(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10
-  ) {
+  async getAllPost(@Query('page') page: number = 1, @Query('limit') limit: number = 10) {
     return this.postService.getAllPost(page, limit);
   }
 
@@ -107,11 +82,7 @@ export class PostControler {
     status: 200,
     description: 'The list of user posts has been returned',
   })
-  async getAllPostByUserId(
-    @Param('userId') userId: string,
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10
-  ) {
+  async getAllPostByUserId(@Param('userId') userId: string, @Query('page') page: number = 1, @Query('limit') limit: number = 10) {
     return this.postService.getAllPostByUserId(userId, page, limit);
   }
 
@@ -126,10 +97,7 @@ export class PostControler {
     status: 403,
     description: 'No permission to update this post',
   })
-  async updatePostById(
-    @Param('id') id: string,
-    @Body() data: UpdatePostDto
-  ): Promise<Posts> {
+  async updatePostById(@Param('id') id: string, @Body() data: UpdatePostDto): Promise<Posts> {
     return this.postService.updatePostById(id, data);
   }
 

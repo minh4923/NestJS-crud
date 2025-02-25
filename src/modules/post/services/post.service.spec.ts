@@ -4,11 +4,7 @@ import { Model, Connection } from 'mongoose';
 import { PostDocument } from '../schemas/post.schema';
 import { CreatePostDto } from '../dto/create-post.dto';
 import { RegisterDto as CreateUserDto } from 'src/modules/auth/dto/auth-register.dto';
-import {
-  createTestingModule,
-  cleanDatabase,
-  closeConnection,
-} from '../../../../test/setup';
+import { createTestingModule, cleanDatabase, closeConnection } from '../../../../test/setup';
 import { UserRepository } from '../../user/repositories/user.repository';
 import { NotFoundException } from '@nestjs/common';
 import { UserDocument } from '../../user/schemas/user.schema';
@@ -27,11 +23,7 @@ describe('PostRepository (with Docker MongoDB)', () => {
       userModel: model1,
       postModel: model2,
       connection: dbConnection,
-    } = await createTestingModule([
-      PostRepository,
-      PostService,
-      UserRepository,
-    ]);
+    } = await createTestingModule([PostRepository, PostService, UserRepository]);
     userModel = model1;
     postModel = model2;
     connection = dbConnection;
@@ -74,9 +66,7 @@ describe('PostRepository (with Docker MongoDB)', () => {
         content: 'test',
       };
 
-      await expect(
-        postService.createPost(postDto, userId)
-      ).rejects.toThrowError(
+      await expect(postService.createPost(postDto, userId)).rejects.toThrowError(
         new NotFoundException(`User with Id: ${userId} not found`)
       );
     });
@@ -89,9 +79,7 @@ describe('PostRepository (with Docker MongoDB)', () => {
       };
       const user = await userRepository.createUser(userDto);
       const postDto = { title: 'test', content: '' };
-      await expect(
-        postService.createPost(postDto, user._id.toString())
-      ).rejects.toThrowError('Error while creating post');
+      await expect(postService.createPost(postDto, user._id.toString())).rejects.toThrowError('Error while creating post');
     });
   });
 
@@ -116,14 +104,8 @@ describe('PostRepository (with Docker MongoDB)', () => {
         content: 'test',
       };
       await postService.createPost(postDto, user1._id.toString());
-      await postService.createPost(
-        { ...postDto, title: 'test2' },
-        user1._id.toString()
-      );
-      await postService.createPost(
-        { ...postDto, title: 'test2' },
-        user2._id.toString()
-      );
+      await postService.createPost({ ...postDto, title: 'test2' }, user1._id.toString());
+      await postService.createPost({ ...postDto, title: 'test2' }, user2._id.toString());
       const result = await postService.getAllPost(page, limit);
       result.data.forEach((post) => {
         expect(post).toHaveProperty('title');
@@ -165,9 +147,7 @@ describe('PostRepository (with Docker MongoDB)', () => {
 
     it('should throw NotFoundException if post not found', async () => {
       const postId = '66f4c1a8fc13ae5c80000000';
-      await expect(postService.getPostById(postId)).rejects.toThrowError(
-        new NotFoundException(`Post with Id: ${postId} not found`)
-      );
+      await expect(postService.getPostById(postId)).rejects.toThrowError(new NotFoundException(`Post with Id: ${postId} not found`));
     });
   });
 
@@ -188,10 +168,7 @@ describe('PostRepository (with Docker MongoDB)', () => {
       const updateDto: UpdatePostDto = {
         title: 'test_update',
       };
-      const result = await postService.updatePostById(
-        post._id as string,
-        updateDto
-      );
+      const result = await postService.updatePostById(post._id as string, updateDto);
       expect(result.title).toBe(updateDto.title);
       expect(result).toHaveProperty('content');
     });
@@ -200,9 +177,7 @@ describe('PostRepository (with Docker MongoDB)', () => {
         title: 'test_update',
       };
       const postId = '66f4c1a8fc13ae5c80000000';
-      await expect(
-        postService.updatePostById(postId, updateDto)
-      ).rejects.toThrowError(
+      await expect(postService.updatePostById(postId, updateDto)).rejects.toThrowError(
         new NotFoundException(`Post with Id: ${postId} not found`)
       );
     });
@@ -226,10 +201,7 @@ describe('PostRepository (with Docker MongoDB)', () => {
     });
     it('should throw NotFoundException if post not found', async () => {
       const postId = '66f4c1a8fc13ae5c80000000';
-      await expect(postService.deletePostById(postId)).rejects.toThrowError(
-        new NotFoundException(`Post with Id: ${postId} not found`)
-      );
+      await expect(postService.deletePostById(postId)).rejects.toThrowError(new NotFoundException(`Post with Id: ${postId} not found`));
     });
   });
 });
-

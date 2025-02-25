@@ -17,12 +17,12 @@ class EnvConfig {
 
   @IsNotEmpty()
   @IsString()
-  JWT_REFRESH_SECRET: string; 
+  JWT_REFRESH_SECRET: string;
 }
 
 export function validateEnv(config: Record<string, unknown>) {
   const validatedConfig = plainToInstance(EnvConfig, config, {
-    enableImplicitConversion: true, 
+    enableImplicitConversion: true,
   });
 
   const errors = validateSync(validatedConfig, {
@@ -32,7 +32,7 @@ export function validateEnv(config: Record<string, unknown>) {
   if (errors.length > 0) {
     console.error('Invalid environment variables:');
     errors.forEach((error) => console.error(error.toString()));
-    process.exit(1); 
+    process.exit(1);
   }
 
   return validatedConfig;

@@ -1,4 +1,4 @@
-import { Module, OnModuleInit} from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { validateEnv } from './config/env.validation';
@@ -8,12 +8,15 @@ import { AuthModule } from './modules/auth/auth.module';
 import { PostModule } from './modules/post/post.module';
 import { createAdmin } from './scripts/create-Admin';
 import jwtConfig from './config/jwt.config';
+
+console.log(' AppModule is loading jwtConfig:', jwtConfig);
+
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: process.env.NODE_ENV === 'test'? '.env.test' :'env',
-      validate: validateEnv,   
+      envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
+      validate: validateEnv,
       load: [jwtConfig],
     }),
 
@@ -30,4 +33,4 @@ import jwtConfig from './config/jwt.config';
     PostModule,
   ],
 })
-export class AppModule{};
+export class AppModule {}
