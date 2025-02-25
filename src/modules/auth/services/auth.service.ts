@@ -28,10 +28,17 @@ export class AuthService {
     if (!user || !(await bcrypt.compare(loginDto.password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
+
     console.log(
-      'JWT_ACCESS_SECRET:',
+      'JWT_ACCESS_SECRET from process.env:',
+      process.env.JWT_ACCESS_SECRET
+    );
+    console.log(
+      'JWT_ACCESS_SECRET from ConfigService:',
       this.configService.get<string>('jwt.accessSecret')
     );
+    console.log('Full JWT config:', this.configService.get('jwt'));
+
     return {
       accessToken: this.jwtService.sign(
         {

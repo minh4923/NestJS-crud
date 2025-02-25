@@ -14,7 +14,7 @@ import jwtConfig from './config/jwt.config';
       isGlobal: true,
       envFilePath: process.env.NODE_ENV === 'test'? '.env.test' :'env',
       validate: validateEnv,   
-      load: [jwtConfig]
+      load: [jwtConfig],
     }),
 
     MongooseModule.forRootAsync({
