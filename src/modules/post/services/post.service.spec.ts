@@ -32,11 +32,8 @@ describe('PostRepository (with Docker MongoDB)', () => {
     userRepository = module.get<UserRepository>(UserRepository);
   });
 
-  afterEach(async () => {
-    await cleanDatabase([postModel, userModel]);
-  });
-
   afterAll(async () => {
+    await cleanDatabase([postModel, userModel]);
     await closeConnection(connection);
   });
   describe('creatPost', () => {
@@ -74,7 +71,7 @@ describe('PostRepository (with Docker MongoDB)', () => {
     it('should throw Error while creating post if database error occurs', async () => {
       const userDto: CreateUserDto = {
         name: 'test',
-        email: 'test22@gmail.com',
+        email: 'test2@gmail.com',
         password: 'test',
       };
       const user = await userRepository.createUser(userDto);
@@ -84,6 +81,9 @@ describe('PostRepository (with Docker MongoDB)', () => {
   });
 
   describe('geAllPost', () => {
+    beforeAll(async () => {
+      await cleanDatabase([postModel, userModel]);
+    });
     it('should return paginated posts', async () => {
       const page = 1;
       const limit = 10;
@@ -123,10 +123,13 @@ describe('PostRepository (with Docker MongoDB)', () => {
   });
 
   describe('getPostById', () => {
+    beforeAll(async () => {
+      await cleanDatabase([postModel, userModel]);
+    });
     it('should return a post if found', async () => {
       const userDto: CreateUserDto = {
         name: 'test',
-        email: 'test@gmail.com',
+        email: 'test3@gmail.com',
         password: 'test',
       };
       const user = await userRepository.createUser(userDto);
@@ -155,7 +158,7 @@ describe('PostRepository (with Docker MongoDB)', () => {
     it('should update a post successfully', async () => {
       const userDto: CreateUserDto = {
         name: 'test',
-        email: 'test@gmail.com',
+        email: 'test4@gmail.com',
         password: 'test',
       };
       const postDto: CreatePostDto = {
@@ -187,7 +190,7 @@ describe('PostRepository (with Docker MongoDB)', () => {
     it('should delete a post successfully', async () => {
       const userDto: CreateUserDto = {
         name: 'test',
-        email: 'test@gmail.com',
+        email: 'test5@gmail.com',
         password: 'test',
       };
       const user = await userRepository.createUser(userDto);

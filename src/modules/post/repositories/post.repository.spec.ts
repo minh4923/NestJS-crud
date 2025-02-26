@@ -2,32 +2,21 @@ import { PostRepository } from './post.repository';
 import { Model, Connection } from 'mongoose';
 import { PostDocument } from '../schemas/post.schema';
 import { CreatePostDto } from '../dto/create-post.dto';
-import {
-  createTestingModule,
-  cleanDatabase,
-  closeConnection,
-} from '../../../../test/setup';
+import { createTestingModule, cleanDatabase, closeConnection } from '../../../../test/setup';
 describe('PostRepository (with Docker MongoDB)', () => {
   let repository: PostRepository;
   let connection: Connection;
   let postModel: Model<PostDocument>;
 
   beforeAll(async () => {
-    const {
-      module,
-      postModel: model,
-      connection: dbConnection,
-    } = await createTestingModule([PostRepository]);
+    const { module, postModel: model, connection: dbConnection } = await createTestingModule([PostRepository]);
     postModel = model;
     connection = dbConnection;
     repository = module.get<PostRepository>(PostRepository);
   });
 
-  afterEach(async () => {
-    await cleanDatabase([postModel]);
-  });
-
   afterAll(async () => {
+    await cleanDatabase([postModel]);
     await closeConnection(connection);
   });
 
@@ -39,12 +28,10 @@ describe('PostRepository (with Docker MongoDB)', () => {
       };
       const userId = '65f4c1a8fc13ae5c80000000';
 
-      const saveSpy = jest
-        .spyOn(postModel.prototype, 'save')
-        .mockResolvedValueOnce({
-          ...postDto,
-          author: userId,
-        });
+      const saveSpy = jest.spyOn(postModel.prototype, 'save').mockResolvedValueOnce({
+        ...postDto,
+        author: userId,
+      });
 
       const createdPost = await repository.createPost(postDto, userId);
 
@@ -54,6 +41,10 @@ describe('PostRepository (with Docker MongoDB)', () => {
     });
   });
   describe('getAllPost', () => {
+    beforeAll(async () => {
+      await cleanDatabase([postModel]);
+    });
+
     it('should return all posts with pagination', async () => {
       const skip = 0;
       const limit = 10;
@@ -100,6 +91,10 @@ describe('PostRepository (with Docker MongoDB)', () => {
   });
 
   describe('getAllPostByUserId', () => {
+     beforeAll(async () => {
+       await cleanDatabase([postModel]);
+     });
+
     it('should return posts by userId with pagination', async () => {
       const postDto: CreatePostDto = {
         title: 'test 1',

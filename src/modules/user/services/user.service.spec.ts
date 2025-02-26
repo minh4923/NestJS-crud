@@ -1,11 +1,7 @@
 import { UserService } from './user.service';
 import { UserRepository } from '../repositories/user.repository';
 import { NotFoundException } from '@nestjs/common';
-import {
-  createTestingModule,
-  cleanDatabase,
-  closeConnection,
-} from '../../../../test/setup';
+import { createTestingModule, cleanDatabase, closeConnection } from '../../../../test/setup';
 import { Model, Connection } from 'mongoose';
 import { UserDocument } from '../schemas/user.schema';
 
@@ -16,11 +12,7 @@ describe('UserService (with Docker MongoDB)', () => {
   let userModel: Model<UserDocument>;
 
   beforeAll(async () => {
-    const {
-      module,
-      userModel: model,
-      connection: dbConnection,
-    } = await createTestingModule([UserService, UserRepository]);
+    const { module, userModel: model, connection: dbConnection } = await createTestingModule([UserService, UserRepository]);
 
     userModel = model;
     connection = dbConnection;
@@ -30,11 +22,8 @@ describe('UserService (with Docker MongoDB)', () => {
     console.log('Connected to MongoDB in Docker');
   });
 
-  afterEach(async () => {
-    await cleanDatabase([userModel]);
-  });
-
   afterAll(async () => {
+    await cleanDatabase([userModel]);
     await closeConnection(connection);
   });
 
@@ -47,7 +36,7 @@ describe('UserService (with Docker MongoDB)', () => {
       };
       const createdUser = await userRepository.createUser(userDto);
       const result = await userService.getUserById(createdUser._id.toString());
-    await new Promise((resolve) => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 200));
       expect(result).toMatchObject({
         name: 'Test User',
         email: 'test1@example.com',
@@ -71,10 +60,8 @@ describe('UserService (with Docker MongoDB)', () => {
 
     it('should throw NotFoundException if user not found', async () => {
       const nonExistentUserId = '65f4c1a8fc13ae5c80000000';
-      await expect(
-        userService.getUserById(nonExistentUserId),
-      ).rejects.toThrowError(
-        new NotFoundException(`User with Id: ${nonExistentUserId} not found`),
+      await expect(userService.getUserById(nonExistentUserId)).rejects.toThrowError(
+        new NotFoundException(`User with Id: ${nonExistentUserId} not found`)
       );
     });
   });
@@ -94,11 +81,9 @@ describe('UserService (with Docker MongoDB)', () => {
     });
 
     it('should throw NotFoundException if user not found', async () => {
-      const nonExistentUserId = '65f4c1a8fc13ae5c80000000';
-      await expect(
-        userService.getUserById(nonExistentUserId),
-      ).rejects.toThrowError(
-        new NotFoundException(`User with Id: ${nonExistentUserId} not found`),
+      const nonExistentUserId = '66f4c1a8fc13ae5c80000000';
+      await expect(userService.getUserById(nonExistentUserId)).rejects.toThrowError(
+        new NotFoundException(`User with Id: ${nonExistentUserId} not found`)
       );
     });
   });

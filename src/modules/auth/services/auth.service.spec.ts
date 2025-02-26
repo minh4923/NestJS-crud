@@ -43,11 +43,9 @@ describe('AuthService (with Docker MongoDB)', () => {
     configService = module.get<ConfigService>(ConfigService);
   });
 
-  afterEach(async () => {
-    await cleanDatabase([userModel]);
-  });
 
   afterAll(async () => {
+    await cleanDatabase([userModel]);
     await closeConnection(connection);
   });
 
