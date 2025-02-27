@@ -23,7 +23,7 @@ export class RolesGuard implements CanActivate {
       throw new UnauthorizedException('You are not logged in yet!');
     }
 
-    const user = await this.userModel.findOne({ _id: userId }).exec();
+    const user = await this.userModel.findById(userId).exec();
     if (!user) {
       throw new UnauthorizedException('User not found!');
     }

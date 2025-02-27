@@ -9,6 +9,6 @@ import { PostModule } from '../post/post.module';
   imports: [MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]), forwardRef(() => PostModule)],
   providers: [UserService, UserRepository],
   controllers: [UserController],
-  exports: [UserService, UserRepository],
+  exports: [UserService, UserRepository, MongooseModule],
 })
 export class UserModule {}
