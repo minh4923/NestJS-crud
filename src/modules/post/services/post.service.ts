@@ -9,7 +9,7 @@ import { UserRepository } from '../../user/repositories/user.repository';
 export class PostService {
   constructor(
     private readonly postRepository: PostRepository,
-    private readonly userRepository: UserRepository,
+    private readonly userRepository: UserRepository
   ) {}
 
   async createPost(data: CreatePostDto, userId: string): Promise<PostDocument> {
@@ -45,15 +45,19 @@ export class PostService {
     return await this.postRepository.getAllPostByUserId(userId, skip, limit);
   }
 
-  async updatePostById(id: string, data: UpdatePostDto): Promise<PostDocument> {
-    const post = await this.postRepository.updatePostById(id, data);
+  async updatePostById(id: string, data: UpdatePostDto, userId: string): Promise<PostDocument | null> {
+    const post = await this.postRepository.getPostById(id);
     if (!post) throw new NotFoundException(`Post with Id: ${id} not found`);
-    return post;
+    if (post.author.toString() !== userId) throw new NotFoundException(`You are not the author of this post`);
+    const postUpdate = await this.postRepository.updatePostById(id, data);
+    return postUpdate;
   }
 
-  async deletePostById(id: string): Promise<{ message: string }> {
-    const post = await this.postRepository.deletePostById(id);
-    if (!post) throw new NotFoundException(`Post with Id: ${id} not found`);
+  async deletePostById(id: string, userId: string): Promise<{ message: string }> {
+    const post = await this.postRepository.getPostById(id);
+    if(!post) throw new NotFoundException(`Post with Id: ${id} not found`);
+    if(post.author.toString() !== userId) throw new NotFoundException(`You are not the author of this post`);
+    const postDelete  = await this.postRepository.deletePostById(id);
     return { message: 'Post deleted successfully' };
   }
 }

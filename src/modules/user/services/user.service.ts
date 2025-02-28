@@ -14,7 +14,8 @@ export class UserService {
     if (!user) throw new NotFoundException(`User with Id: ${id} not found`);
     return user;
   }
-  async updateUserById(id: string, data: UpdateUserDto) {
+  async updateUserById(id: string, data: UpdateUserDto, userId: string) {
+    if(userId !== id) throw new NotFoundException('You are not the owner of this user');  
     const user = await this.userRepository.updateUserById(id, data);  
     if (!user) throw new NotFoundException(`User with Id: ${id} not found`);
     return user;

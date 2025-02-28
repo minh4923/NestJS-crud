@@ -17,7 +17,7 @@ export class JwtMiddleware implements NestMiddleware {
         const payload = this.jwtService.verify(token);
         req.user = payload;
       } catch (error) {
-        console.log('JWT không hợp lệ:', error.message);
+        console.log('JWT no', error.message);
       }
     }
 

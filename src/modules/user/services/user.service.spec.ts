@@ -4,6 +4,8 @@ import { NotFoundException } from '@nestjs/common';
 import { createTestingModule, cleanDatabase, closeConnection } from '../../../../test/setup';
 import { Model, Connection } from 'mongoose';
 import { UserDocument } from '../schemas/user.schema';
+import e from 'express';
+import { EXCEPTION_FILTERS_METADATA } from '@nestjs/common/constants';
 
 describe('UserService (with Docker MongoDB)', () => {
   let userService: UserService;
@@ -44,7 +46,30 @@ describe('UserService (with Docker MongoDB)', () => {
       expect(result._id).toBeDefined();
     });
   });
-
+  describe('getAllUsers', () => {
+    beforeAll(async () => {
+      await cleanDatabase([userModel]);
+    });
+    it('should return all users with pagination', async () => {
+      const skip = 0;
+      const limit = 10;
+      const userDto = {
+        name: 'Test User',
+        email: 'test1@example.com',
+        password: 'hashedpassword',
+      };
+      await userRepository.createUser(userDto);
+      await userRepository.createUser({ ...userDto, email: 'test11@example.com' });
+      const result = await userService.getAllUsers(skip, limit);
+      expect(result).toHaveProperty('data');
+      expect(result).toHaveProperty('page');
+      expect(result).toHaveProperty('limit');
+      expect(result).toHaveProperty('total');
+      expect(result.page).toBe(1);
+      expect(result.limit).toBe(limit);
+      expect(result.total).toBe(2);
+    });
+  });
   describe('getUserById', () => {
     it('should return user if found', async () => {
       const createdUser = await userRepository.createUser({
@@ -76,7 +101,6 @@ describe('UserService (with Docker MongoDB)', () => {
 
       await userService.deleteUserById(createdUser._id.toString());
       const deletedUser = await userModel.findById(createdUser._id.toString());
-
       expect(deletedUser).toBeNull();
     });
 

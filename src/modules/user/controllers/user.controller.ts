@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Put, Delete, Body, Query } from '@nestjs/common';
+import { Controller, Get, Param, Put, Delete, Body, Query, Request} from '@nestjs/common';
 import { UserService } from '../services/user.service';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { Auth } from '../../auth/guards/auth.decorator';
@@ -21,7 +21,7 @@ export class UserController {
   }
 
   @Get(':id')
-  @Auth('admin','owner') 
+  @Auth('admin') 
   @ApiOperation({ summary: 'Get user information by ID' })
   @ApiParam({ name: 'id', required: true, description: 'User ID' })
   @ApiResponse({ status: 200, description: 'User information is returned' })
@@ -31,14 +31,14 @@ export class UserController {
   }
 
   @Put(':id')
-  @Auth('admin ','owner') 
+  @Auth('admin ','user') 
   @ApiOperation({ summary: 'Update user information' })
   @ApiParam({ name: 'id', required: true, description: 'User ID' })
   @ApiBody({ type: UpdateUserDto })
   @ApiResponse({ status: 200, description: 'User information is updated' })
   @ApiResponse({ status: 400, description: 'Invalid input data' })
-  async updateUserById(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.updateUserById(id, updateUserDto);
+  async updateUserById(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @Request() req) {
+    return this.userService.updateUserById(id, updateUserDto , req.user.id);  
   }
 
   @Delete(':id')

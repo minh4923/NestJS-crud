@@ -171,16 +171,18 @@ describe('PostRepository (with Docker MongoDB)', () => {
       const updateDto: UpdatePostDto = {
         title: 'test_update',
       };
-      const result = await postService.updatePostById(post._id as string, updateDto);
-      expect(result.title).toBe(updateDto.title);
+      const result = await postService.updatePostById(post._id as string, updateDto, user._id.toString());
+      expect(result).toHaveProperty('_id');
+      expect(result!.title).toBe(updateDto.title);
       expect(result).toHaveProperty('content');
     });
     it('should throw NotFoundException if post not found', async () => {
+      const postId = '66f4c1a8fc13ae5c80000000';
       const updateDto: UpdatePostDto = {
         title: 'test_update',
       };
-      const postId = '66f4c1a8fc13ae5c80000000';
-      await expect(postService.updatePostById(postId, updateDto)).rejects.toThrowError(
+      const userId = '66f4c1a8fc13ae5c80000000';
+      await expect(postService.updatePostById(postId, updateDto, userId)).rejects.toThrowError(
         new NotFoundException(`Post with Id: ${postId} not found`)
       );
     });
@@ -199,12 +201,13 @@ describe('PostRepository (with Docker MongoDB)', () => {
         content: 'test',
       };
       const post = await postService.createPost(postDto, user._id.toString());
-      const result = await postService.deletePostById(post._id as string);
+      const result = await postService.deletePostById(post._id as string, user._id.toString());
       expect(result).toEqual({ message: 'Post deleted successfully' });
     });
     it('should throw NotFoundException if post not found', async () => {
       const postId = '66f4c1a8fc13ae5c80000000';
-      await expect(postService.deletePostById(postId)).rejects.toThrowError(new NotFoundException(`Post with Id: ${postId} not found`));
+      const userId = ' 66f4c1a8fc13ae5c80000000';
+      await expect(postService.deletePostById(postId,userId)).rejects.toThrowError(new NotFoundException(`Post with Id: ${postId} not found`));
     });
   });
 });
